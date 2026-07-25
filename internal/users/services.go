@@ -2,12 +2,13 @@ package users
 
 import (
 	"context"
+	"encoding/json"
+	"time"
+
 	"github.com/jimmymalark/go_api_template/internal/cache"
 	"github.com/jimmymalark/go_api_template/internal/cache/keys"
 	"github.com/jimmymalark/go_api_template/internal/ids"
 	"github.com/jimmymalark/go_api_template/internal/pagination"
-	"encoding/json"
-	"time"
 )
 
 type Service struct {
@@ -48,19 +49,39 @@ func (s *Service) ListUsers(
 	return users, nil
 }
 
-func (s *Service) getCachedUsers(ctx context.Context, p pagination.Params) ([]UserResponse, bool) {
-	var users []UserResponse
-	if s.cache.Get(ctx, keys.UsersList(p), &users) {
-		return users, true
+func (s *Service) getCachedUsers(
+	ctx context.Context,
+	p pagination.Params,
+) (pagination.Response[UserResponse], bool) {
+	var res pagination.Response[UserResponse]
+
+	if s.cache.Get(ctx, keys.UsersList(p), &res) {
+		return res, true
 	}
 
-	return users, false
+	return pagination.Response[UserResponse]{}, false
+}
+
+func (s *Service) cacheUsers(
+	ctx context.Context,
+	p pagination.Params,
+	res pagination.Response[UserResponse],
+) {
+	data, err := json.Marshal(res)
+	if err != nil {
+		return
+	}
+
+	_ = s.cache.Set(ctx, keys.UsersList(p), data, 10*time.Minute)
 }
 
 func (s *Service) loadUsers(
 	ctx context.Context,
 	p pagination.Params,
 ) (pagination.Response[UserResponse], error) {
+	if res, ok := s.getCachedUsers(ctx, p); ok {
+		return res, nil
+	}
 
 	dbUsers, err := s.repo.ListUsers(ctx, p)
 	if err != nil {
@@ -72,26 +93,19 @@ func (s *Service) loadUsers(
 		return pagination.Response[UserResponse]{}, err
 	}
 
-	users := toUserResponses(dbUsers)
-
-	return pagination.Response[UserResponse]{
-		Items: users,
+	res := pagination.Response[UserResponse]{
+		Items: toUserResponses(dbUsers),
 		Pagination: pagination.Metadata{
 			Page:       p.Page,
 			Limit:      p.Limit,
 			TotalItems: int(total),
 			TotalPages: (int(total) + p.Limit - 1) / p.Limit,
 		},
-	}, nil
-}
-
-func (s *Service) cacheUsers(ctx context.Context, p pagination.Params, users []UserResponse) {
-	data, err := json.Marshal(users)
-	if err != nil {
-		return
 	}
 
-	_ = s.cache.Set(ctx, keys.UsersList(p), data, 10*time.Minute)
+	s.cacheUsers(ctx, p, res)
+
+	return res, nil
 }
 
 func (s *Service) CreateUser(ctx context.Context, req CreateUserRequest) (UserResponse, error) {
