@@ -1,7 +1,7 @@
 package users
 
 import (
-	db "dbApi/internal/db/sqlc"
+	db "github.com/jimmymalark/go_api_template/internal/db/sqlc"
 )
 
 func toUserResponse(user db.User) UserResponse {

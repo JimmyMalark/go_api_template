@@ -2,9 +2,9 @@ package users
 
 import (
 	"context"
-	"dbApi/internal/apperrors"
-	db "dbApi/internal/db/sqlc"
-	"dbApi/internal/pagination"
+	"github.com/jimmymalark/go_api_template/internal/apperrors"
+	db "github.com/jimmymalark/go_api_template/internal/db/sqlc"
+	"github.com/jimmymalark/go_api_template/internal/pagination"
 )
 
 type Repository struct {

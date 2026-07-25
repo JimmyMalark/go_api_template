@@ -2,7 +2,7 @@ package cache
 
 import (
 	"context"
-	"dbApi/internal/config"
+	"github.com/jimmymalark/go_api_template/internal/config"
 	"encoding/json"
 	"time"
 

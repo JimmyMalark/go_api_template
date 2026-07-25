@@ -1,7 +1,7 @@
 package keys
 
 import (
-	"dbApi/internal/pagination"
+	"github.com/jimmymalark/go_api_template/internal/pagination"
 	"fmt"
 )
 

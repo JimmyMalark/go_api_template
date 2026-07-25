@@ -2,13 +2,13 @@ package app
 
 import (
 	"context"
-	"dbApi/internal/cache"
-	"dbApi/internal/config"
-	"dbApi/internal/db"
-	sqlc "dbApi/internal/db/sqlc"
-	"dbApi/internal/logger"
-	"dbApi/internal/users"
-	"dbApi/internal/validator"
+	"github.com/jimmymalark/go_api_template/internal/cache"
+	"github.com/jimmymalark/go_api_template/internal/config"
+	"github.com/jimmymalark/go_api_template/internal/db"
+	sqlc "github.com/jimmymalark/go_api_template/internal/db/sqlc"
+	"github.com/jimmymalark/go_api_template/internal/logger"
+	"github.com/jimmymalark/go_api_template/internal/users"
+	"github.com/jimmymalark/go_api_template/internal/validator"
 	"time"
 
 	"github.com/go-chi/chi/v5"

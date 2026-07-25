@@ -1,0 +1,66 @@
+version: "3"
+
+tasks:
+  run:
+    cmds:
+      - go run ./cmd/api
+
+  dev:
+    desc: Run the API with live reload
+    preconditions:
+      - sh: command -v air >/dev/null 2>&1
+        msg: "Air is not installed. Run: go install github.com/air-verse/air@latest"
+    cmds:
+      - air
+
+  build:
+    cmds:
+      - go build -o bin/api ./cmd/api
+
+  version: "3"
+
+  build:release:
+    desc: Build production binaries
+    vars:
+      PLATFORMS:
+        - linux/amd64
+        - linux/arm64
+        - darwin/amd64
+        - darwin/arm64
+        - windows/amd64
+        - windows/arm64
+    cmds:
+      - mkdir -p dist
+      - |
+        for platform in {{join " " .PLATFORMS}}; do
+          OS=${platform%/*}
+          ARCH=${platform#*/}
+          EXT=""
+          [ "$OS" = "windows" ] && EXT=".exe"
+
+          GOOS=$OS GOARCH=$ARCH \
+            go build \
+              -trimpath \
+              -ldflags="-s -w" \
+              -o "dist/api-$OS-$ARCH$EXT" \
+              ./cmd/api
+        done
+
+  test:
+    cmds:
+      - go test ./...
+
+  swagger:
+    cmds:
+      - swag init -g ./cmd/api/main.go --output ./docs
+
+  rename:
+    desc: Rename the Go module
+    requires:
+      vars: [MODULE]
+    vars:
+      MODULE: "{{.MODULE}}"
+    cmds:
+      - go mod edit -module {{.MODULE}}
+      - perl -pi -e 's|dbApi|{{.MODULE}}|g' $(find . -name "*.go")
+      - go mod tidy

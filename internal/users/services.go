@@ -2,10 +2,10 @@ package users
 
 import (
 	"context"
-	"dbApi/internal/cache"
-	"dbApi/internal/cache/keys"
-	"dbApi/internal/ids"
-	"dbApi/internal/pagination"
+	"github.com/jimmymalark/go_api_template/internal/cache"
+	"github.com/jimmymalark/go_api_template/internal/cache/keys"
+	"github.com/jimmymalark/go_api_template/internal/ids"
+	"github.com/jimmymalark/go_api_template/internal/pagination"
 	"encoding/json"
 	"time"
 )

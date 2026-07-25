@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"dbApi/internal/app"
+	"github.com/jimmymalark/go_api_template/internal/app"
 	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
 
-	_ "dbApi/docs"
+	_ "github.com/jimmymalark/go_api_template/docs"
 )
 
 func main() {

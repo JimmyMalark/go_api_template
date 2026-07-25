@@ -3,11 +3,11 @@ version: "3"
 vars:
   DB_URL: postgres://{{.DB_USER}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_NAME}}?sslmode={{.DB_SSLMODE}}
 
-tasks:
+includes:
   sqlc:
-    cmds:
-      - sqlc generate
+    taskfile: ./sqlc/taskfile.yml
 
+tasks:
   migrate:up:
     cmds:
       - goose -dir ./migrations postgres "{{.DB_URL}}" up

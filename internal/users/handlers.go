@@ -1,10 +1,10 @@
 package users
 
 import (
-	"dbApi/internal/apperrors"
-	"dbApi/internal/httpx"
-	"dbApi/internal/pagination"
-	"dbApi/internal/validator"
+	"github.com/jimmymalark/go_api_template/internal/apperrors"
+	"github.com/jimmymalark/go_api_template/internal/httpx"
+	"github.com/jimmymalark/go_api_template/internal/pagination"
+	"github.com/jimmymalark/go_api_template/internal/validator"
 	"encoding/json"
 	"net/http"
 	"strconv"

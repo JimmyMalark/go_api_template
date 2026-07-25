@@ -1,9 +1,9 @@
 package users
 
 import (
-	"dbApi/internal/cache"
-	db "dbApi/internal/db/sqlc"
-	"dbApi/internal/validator"
+	"github.com/jimmymalark/go_api_template/internal/cache"
+	db "github.com/jimmymalark/go_api_template/internal/db/sqlc"
+	"github.com/jimmymalark/go_api_template/internal/validator"
 
 	"github.com/go-chi/chi/v5"
 )

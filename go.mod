@@ -1,4 +1,4 @@
-module dbApi
+module github.com/jimmymalark/go_api_template
 
 go 1.26.4
 

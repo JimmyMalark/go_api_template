@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"dbApi/internal/config"
+	"github.com/jimmymalark/go_api_template/internal/config"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
