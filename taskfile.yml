@@ -1,0 +1,29 @@
+version: "3"
+
+dotenv:
+  - .env
+
+includes:
+  db:
+    taskfile: ./internal/db/taskfile.yml
+    dir: ./internal/db
+  docker:
+    taskfile: ./docker/taskfile.yml
+    dir: ./docker
+
+tasks:
+  run:
+    cmds:
+      - go run ./cmd/api
+
+  build:
+    cmds:
+      - go build -o bin/api ./cmd/api
+
+  test:
+    cmds:
+      - go test ./...
+
+  swagger:
+    cmds:
+      - swag init -g ./cmd/api/main.go --output ./docs

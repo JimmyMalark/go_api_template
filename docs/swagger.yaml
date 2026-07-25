@@ -1,0 +1,88 @@
+basePath: /v1
+definitions:
+  httpx.ErrorResponse:
+    properties:
+      message:
+        example: internal server error
+        type: string
+    type: object
+  users.CreateUserRequest:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      username:
+        example: john
+        type: string
+    type: object
+  users.UserResponse:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      username:
+        example: john
+        type: string
+    type: object
+info:
+  contact:
+    email: you@example.com
+    name: Your Name
+  description: A REST API for managing users.
+  license:
+    name: MIT
+  title: DB API
+  version: "1.0"
+paths:
+  /v1/users:
+    get:
+      description: Get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/users.UserResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpx.ErrorResponse'
+      summary: List users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: User payload
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/users.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/users.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpx.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpx.ErrorResponse'
+      summary: Create user
+      tags:
+      - users
+swagger: "2.0"
