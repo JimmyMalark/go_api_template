@@ -1,13 +1,14 @@
 package users
 
 import (
+	"encoding/json"
+	"net/http"
+	"strconv"
+
 	"github.com/jimmymalark/go_api_template/internal/apperrors"
 	"github.com/jimmymalark/go_api_template/internal/httpx"
 	"github.com/jimmymalark/go_api_template/internal/pagination"
 	"github.com/jimmymalark/go_api_template/internal/validator"
-	"encoding/json"
-	"net/http"
-	"strconv"
 )
 
 type Handler struct {
@@ -30,8 +31,10 @@ func NewHandler(service *Service, validator *validator.Validator) *Handler {
 //	@Produce		json
 //	@Success		200	{array}		users.UserResponse
 //	@Failure		500	{object}	httpx.ErrorResponse
+//	@Param			page	query		int		false	"Page number"		default(1)		minimum(1)
+//	@Param			limit	query		int		false	"Items per page"	default(20)		minimum(1)	maximum(100)
 //
-// @Router /v1/users [get]
+// @Router /admin/users [get]
 func (h *Handler) ListUsers(w http.ResponseWriter, r *http.Request) {
 	page := 1
 	limit := 20
@@ -78,7 +81,7 @@ func (h *Handler) ListUsers(w http.ResponseWriter, r *http.Request) {
 //	@Failure		400		{object}	httpx.ErrorResponse
 //	@Failure		500		{object}	httpx.ErrorResponse
 //
-// @Router /v1/users [post]
+// @Router /admin/users [post]
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var req CreateUserRequest
 

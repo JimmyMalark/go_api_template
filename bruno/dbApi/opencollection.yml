@@ -1,7 +1,7 @@
 opencollection: 1.0.0
 
 info:
-  name: dbApi
+  name: go_api_template
 config:
   proxy:
     inherit: true

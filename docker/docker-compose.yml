@@ -3,7 +3,7 @@
 services:
   postgres:
     image: postgres:18
-    container_name: dbApi-psql
+    container_name: go_api_template-psql
     restart: unless-stopped
 
     environment:
@@ -15,21 +15,21 @@ services:
       - "${DB_PORT}:5432"
 
     volumes:
-      - dbApi_data:/var/lib/postgresql
+      - go_api_template_data:/var/lib/postgresql
 
   valkey:
     image: valkey/valkey
-    container_name: dbApi-valkey
+    container_name: go_api_template-valkey
     restart: unless-stopped
 
     ports:
       - "${CACHE_PORT:-6379}:6379"
 
     volumes:
-      - dbApi_valkey:/data
+      - go_api_template_valkey:/data
 
     command: valkey-server --save 60 1 --loglevel warning
 
 volumes:
-  dbApi_data:
-  dbApi_valkey:
+  go_api_template_data:
+  go_api_template_valkey:

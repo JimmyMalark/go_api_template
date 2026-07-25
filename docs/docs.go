@@ -9,19 +9,13 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {
-            "name": "Your Name",
-            "email": "you@example.com"
-        },
-        "license": {
-            "name": "MIT"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/users": {
+        "/admin/users": {
             "get": {
                 "description": "Get all users",
                 "produces": [
@@ -31,6 +25,25 @@ const docTemplate = `{
                     "users"
                 ],
                 "summary": "List users",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -107,13 +120,35 @@ const docTemplate = `{
         },
         "users.CreateUserRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "username"
+            ],
             "properties": {
+                "birth_date": {
+                    "type": "string",
+                    "example": "1998-05-14T00:00:00Z"
+                },
                 "email": {
                     "type": "string",
                     "example": "john@example.com"
                 },
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3,
+                    "example": "john"
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3,
+                    "example": "doe"
+                },
                 "username": {
                     "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3,
                     "example": "john"
                 }
             }
@@ -121,17 +156,29 @@ const docTemplate = `{
         "users.UserResponse": {
             "type": "object",
             "properties": {
+                "birth_date": {
+                    "type": "string",
+                    "example": "1998-05-14T00:00:00Z"
+                },
                 "email": {
                     "type": "string",
                     "example": "john@example.com"
                 },
-                "id": {
-                    "type": "integer",
-                    "example": 1
+                "first_name": {
+                    "type": "string",
+                    "example": "john"
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "doe"
                 },
                 "username": {
                     "type": "string",
                     "example": "john"
+                },
+                "xid": {
+                    "type": "string",
+                    "example": "9m4e2mr0ui3e8a215n4g"
                 }
             }
         }
@@ -144,8 +191,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/v1",
 	Schemes:          []string{},
-	Title:            "DB API",
-	Description:      "A REST API for managing users.",
+	Title:            "Go API Template",
+	Description:      "A production-ready Go API template.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

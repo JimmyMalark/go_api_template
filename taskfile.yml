@@ -13,3 +13,15 @@ includes:
   app:
     taskfile: ./internal/app/taskfile.yml
     flatten: true
+
+tasks:
+  rename:
+    desc: Rename the Go module
+    requires:
+      vars: [MODULE]
+    vars:
+      MODULE: "{{.MODULE}}"
+    cmds:
+      - go mod edit -module {{.MODULE}}
+      - perl -pi -e 's|go_api_template|{{.MODULE}}|g' $(find . -name "*")
+      - go mod tidy

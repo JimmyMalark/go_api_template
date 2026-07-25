@@ -17,8 +17,6 @@ tasks:
     cmds:
       - go build -o bin/api ./cmd/api
 
-  version: "3"
-
   build:release:
     desc: Build production binaries
     vars:
@@ -52,15 +50,4 @@ tasks:
 
   swagger:
     cmds:
-      - swag init -g ./cmd/api/main.go --output ./docs
-
-  rename:
-    desc: Rename the Go module
-    requires:
-      vars: [MODULE]
-    vars:
-      MODULE: "{{.MODULE}}"
-    cmds:
-      - go mod edit -module {{.MODULE}}
-      - perl -pi -e 's|dbApi|{{.MODULE}}|g' $(find . -name "*.go")
-      - go mod tidy
+      - swag init -g cmd/api/main.go --output ./docs
