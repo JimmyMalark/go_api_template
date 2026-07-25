@@ -16,6 +16,14 @@ tasks:
     cmds:
       - go run ./cmd/api
 
+  dev:
+    desc: Run the API with live reload
+    preconditions:
+      - sh: command -v air >/dev/null 2>&1
+        msg: "Air is not installed. Run: go install github.com/air-verse/air@latest"
+    cmds:
+      - air
+
   build:
     cmds:
       - go build -o bin/api ./cmd/api

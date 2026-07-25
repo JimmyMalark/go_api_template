@@ -9,10 +9,13 @@ import (
 	"dbApi/internal/logger"
 	"dbApi/internal/users"
 	"dbApi/internal/validator"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/httprate"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -57,6 +60,10 @@ func New(ctx context.Context) (*App, error) {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
+	r.Use(middleware.Timeout(time.Second * 60))
+	r.Use(httprate.LimitByIP(100, 1*time.Minute))
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.RequestID)
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
