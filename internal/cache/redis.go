@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"dbApi/internal/config"
 	"encoding/json"
 	"time"
 
@@ -16,6 +17,13 @@ func New(client *redis.Client) Cache {
 	return &RedisCache{
 		client: client,
 	}
+}
+
+func Client(ctx context.Context, cfg config.CacheConfig) (*redis.Client, error) {
+	return redis.NewClient(&redis.Options{
+		Addr: cfg.Addr(),
+		DB:   0,
+	}), nil
 }
 
 func (r *RedisCache) Get(

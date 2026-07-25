@@ -6,9 +6,9 @@ import (
 )
 
 type Config struct {
-	Database Database
-	App      App
-	Cache    Cache
+	App   AppConfig
+	DB    DBConfig
+	Cache CacheConfig
 }
 
 func Load() (*Config, error) {
@@ -17,6 +17,10 @@ func Load() (*Config, error) {
 
 	var cfg Config
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
+		return nil, err
+	}
+
+	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
 

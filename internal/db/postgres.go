@@ -7,6 +7,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewPostgres(ctx context.Context, cfg config.Database) (*pgxpool.Pool, error) {
-	return pgxpool.New(ctx, cfg.DSN())
+func NewPostgres(ctx context.Context, cfg config.DBConfig) (*pgxpool.Pool, error) {
+	return pgxpool.New(ctx, cfg.Addr())
 }

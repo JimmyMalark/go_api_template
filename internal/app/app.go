@@ -35,17 +35,21 @@ func New(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	pool, err := db.NewPostgres(ctx, cfg.Database)
+	pool, err := db.NewPostgres(ctx, cfg.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	redisClient := redis.NewClient(&redis.Options{
-		Addr: cfg.Cache.CSN(),
-		DB:   0,
-	})
+	// redisClient := redis.NewClient(&redis.Options{
+	// 	Addr: cfg.Cache.Addr(),
+	// 	DB:   0,
+	// })
 
-	cacheService := cache.New(redisClient)
+	redis_client, err := cache.Client(ctx, cfg.Cache)
+	if err != nil {
+		return nil, err
+	}
+	cacheService := cache.New(redis_client)
 
 	queries := sqlc.New(pool)
 
@@ -69,7 +73,7 @@ func New(ctx context.Context) (*App, error) {
 	return &App{
 		Config: cfg,
 		DB:     pool,
-		Redis:  redisClient,
+		Redis:  redis_client,
 		Router: r,
 	}, nil
 }

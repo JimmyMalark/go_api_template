@@ -2,12 +2,12 @@ package config
 
 import "fmt"
 
-type Cache struct {
-	Host string `env:"CACHE_HOST" env-default:"localhost"`
-	Port int    `env:"CACHE_PORT" env-default:"5432"`
+type CacheConfig struct {
+	Host string `env:"CACHE_HOST" env-required:"true"`
+	Port int    `env:"CACHE_PORT" env-default:"6379"`
 }
 
-func (d Cache) CSN() string {
+func (d CacheConfig) Addr() string {
 	return fmt.Sprintf(
 		"%s:%d",
 		d.Host,
