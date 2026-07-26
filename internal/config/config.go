@@ -6,9 +6,10 @@ import (
 )
 
 type Config struct {
-	App   AppConfig
-	DB    DBConfig
-	Cache CacheConfig
+	App    AppConfig
+	DB     DBConfig
+	Cache  CacheConfig
+	Cookie CookieConfig
 }
 
 func Load() (*Config, error) {

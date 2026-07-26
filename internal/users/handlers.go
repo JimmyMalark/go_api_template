@@ -91,7 +91,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.validator.Struct(req); err != nil {
-		// TODO: Add debug logger
+		// TODO: Add debug/info/error logger
 		httpx.WriteJSON(
 			w,
 			http.StatusBadRequest,

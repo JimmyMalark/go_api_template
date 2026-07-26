@@ -2,6 +2,9 @@ package app
 
 import (
 	"context"
+	"time"
+
+	"github.com/jimmymalark/go_api_template/internal/auth"
 	"github.com/jimmymalark/go_api_template/internal/cache"
 	"github.com/jimmymalark/go_api_template/internal/config"
 	"github.com/jimmymalark/go_api_template/internal/db"
@@ -9,7 +12,6 @@ import (
 	"github.com/jimmymalark/go_api_template/internal/logger"
 	"github.com/jimmymalark/go_api_template/internal/users"
 	"github.com/jimmymalark/go_api_template/internal/validator"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -56,6 +58,7 @@ func New(ctx context.Context) (*App, error) {
 	cacheService := cache.New(redis_client)
 
 	queries := sqlc.New(pool)
+	store := db.NewStore(pool)
 
 	r := chi.NewRouter()
 
@@ -77,6 +80,8 @@ func New(ctx context.Context) (*App, error) {
 
 	r.Route("/v1", func(r chi.Router) {
 		users.RegisterRoutes(r, queries, cacheService)
+
+		auth.RegisterRoutes(r, store)
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(

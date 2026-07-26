@@ -99,9 +99,172 @@
                     }
                 }
             }
+        },
+        "/auth/login": {
+            "post": {
+                "description": "Authenticate a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login",
+                "responses": {}
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "description": "Logout the current user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Logout",
+                "responses": {}
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "description": "Get the currently authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Current user",
+                "responses": {}
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "description": "Register a new user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register",
+                "parameters": [
+                    {
+                        "description": "Registration payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/auth.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpx.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "auth.RegisterRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "birth_date": {
+                    "type": "string",
+                    "example": "1998-05-14T00:00:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3,
+                    "example": "john"
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3,
+                    "example": "doe"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3,
+                    "example": "john"
+                }
+            }
+        },
+        "auth.UserResponse": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string",
+                    "example": "1998-05-14T00:00:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "first_name": {
+                    "type": "string",
+                    "example": "john"
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "doe"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "john"
+                },
+                "xid": {
+                    "type": "string",
+                    "example": "9m4e2mr0ui3e8a215n4g"
+                }
+            }
+        },
         "httpx.ErrorResponse": {
             "type": "object",
             "properties": {

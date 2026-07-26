@@ -23,19 +23,20 @@ func (q *Queries) CountUsers(ctx context.Context) (int64, error) {
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (xid, username, email, first_name, last_name, birth_date, created_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, xid, username, email, first_name, last_name, birth_date, created_at
+INSERT INTO users (xid, username, email, first_name, last_name, password_hash, birth_date, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING id, xid, email, username, password_hash, first_name, last_name, birth_date, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	Xid       string
-	Username  string
-	Email     string
-	FirstName string
-	LastName  string
-	BirthDate *time.Time
-	CreatedAt time.Time
+	Xid          string
+	Username     string
+	Email        string
+	FirstName    string
+	LastName     string
+	PasswordHash string
+	BirthDate    *time.Time
+	CreatedAt    time.Time
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -45,6 +46,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Email,
 		arg.FirstName,
 		arg.LastName,
+		arg.PasswordHash,
 		arg.BirthDate,
 		arg.CreatedAt,
 	)
@@ -52,40 +54,116 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	err := row.Scan(
 		&i.ID,
 		&i.Xid,
-		&i.Username,
 		&i.Email,
+		&i.Username,
+		&i.PasswordHash,
 		&i.FirstName,
 		&i.LastName,
 		&i.BirthDate,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, xid, username, email, first_name, last_name, birth_date, created_at
+SELECT id, xid, email, username, password_hash, first_name, last_name, birth_date, created_at, updated_at
 FROM users
-WHERE id = $1
+WHERE xid = $1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
+func (q *Queries) GetUser(ctx context.Context, xid string) (User, error) {
+	row := q.db.QueryRow(ctx, getUser, xid)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Xid,
-		&i.Username,
 		&i.Email,
+		&i.Username,
+		&i.PasswordHash,
 		&i.FirstName,
 		&i.LastName,
 		&i.BirthDate,
 		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, xid, email, username, password_hash, first_name, last_name, birth_date, created_at, updated_at
+FROM users
+WHERE email = $1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Xid,
+		&i.Email,
+		&i.Username,
+		&i.PasswordHash,
+		&i.FirstName,
+		&i.LastName,
+		&i.BirthDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, xid, email, username, password_hash, first_name, last_name, birth_date, created_at, updated_at
+FROM users
+WHERE id = $1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Xid,
+		&i.Email,
+		&i.Username,
+		&i.PasswordHash,
+		&i.FirstName,
+		&i.LastName,
+		&i.BirthDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id, xid, email, username, password_hash, first_name, last_name, birth_date, created_at, updated_at
+FROM users
+WHERE username = $1
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByUsername, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Xid,
+		&i.Email,
+		&i.Username,
+		&i.PasswordHash,
+		&i.FirstName,
+		&i.LastName,
+		&i.BirthDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, xid, username, email, first_name, last_name, birth_date, created_at
+SELECT id, xid, email, username, password_hash, first_name, last_name, birth_date, created_at, updated_at
 FROM users
 ORDER BY id
 LIMIT $1
@@ -109,12 +187,14 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		if err := rows.Scan(
 			&i.ID,
 			&i.Xid,
-			&i.Username,
 			&i.Email,
+			&i.Username,
+			&i.PasswordHash,
 			&i.FirstName,
 			&i.LastName,
 			&i.BirthDate,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

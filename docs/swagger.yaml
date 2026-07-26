@@ -1,5 +1,57 @@
 basePath: /v1
 definitions:
+  auth.RegisterRequest:
+    properties:
+      birth_date:
+        example: "1998-05-14T00:00:00Z"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      first_name:
+        example: john
+        maxLength: 100
+        minLength: 3
+        type: string
+      last_name:
+        example: doe
+        maxLength: 100
+        minLength: 3
+        type: string
+      password:
+        minLength: 8
+        type: string
+      username:
+        example: john
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  auth.UserResponse:
+    properties:
+      birth_date:
+        example: "1998-05-14T00:00:00Z"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      first_name:
+        example: john
+        type: string
+      last_name:
+        example: doe
+        type: string
+      username:
+        example: john
+        type: string
+      xid:
+        example: 9m4e2mr0ui3e8a215n4g
+        type: string
+    type: object
   httpx.ErrorResponse:
     properties:
       message:
@@ -122,4 +174,67 @@ paths:
       summary: Create user
       tags:
       - users
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user
+      produces:
+      - application/json
+      responses: {}
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Logout the current user
+      produces:
+      - application/json
+      responses: {}
+      summary: Logout
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Get the currently authenticated user
+      produces:
+      - application/json
+      responses: {}
+      summary: Current user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account
+      parameters:
+      - description: Registration payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/auth.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpx.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/httpx.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpx.ErrorResponse'
+      summary: Register
+      tags:
+      - auth
 swagger: "2.0"
