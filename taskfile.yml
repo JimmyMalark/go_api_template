@@ -14,14 +14,35 @@ includes:
     taskfile: ./internal/app/taskfile.yml
     flatten: true
 
+vars:
+  EXCLUDES: \( -path './docs' -o -path './vendor' -o -path './.git' \)
+
 tasks:
-  rename:
-    desc: Rename the Go module
+  rename-name:
+    requires:
+      vars: [NAME]
+    cmds:
+      - >
+        find . {{.EXCLUDES}} -prune -o -type f -print0 |
+        xargs -0 perl -pi -e 's|template_test7|{{.NAME}}|g'
+
+  rename-module:
     requires:
       vars: [MODULE]
-    vars:
-      MODULE: "{{.MODULE}}"
     cmds:
       - go mod edit -module {{.MODULE}}
-      - perl -pi -e 's|go_api_template|{{.MODULE}}|g' $(find . -name "*")
+      - >
+        find . {{.EXCLUDES}} -prune -o -type f
+        -exec perl -pi -e 's|github.com/jimmymalark/template_test7|{{.MODULE}}|g' {} +
+  rename:
+    requires:
+      vars: [MODULE, NAME]
+    deps:
+      - task: rename-name
+        vars:
+          NAME: "{{.NAME}}"
+      - task: rename-module
+        vars:
+          MODULE: "{{.MODULE}}"
+    cmds:
       - go mod tidy
