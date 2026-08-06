@@ -1,10 +1,10 @@
 info:
-  name: Register
+  name: Logout
   type: http
 
 http:
-  method: GET
-  url: "{{url}}/auth/register"
+  method: POST
+  url: "{{url}}/auth/logout"
   auth: inherit
 
 settings:

@@ -24,3 +24,13 @@ type RegisterResult struct {
 	User         UserResponse
 	SessionToken string
 }
+
+type LoginRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8"`
+}
+
+type LoginResult struct {
+	User         UserResponse
+	SessionToken string
+}

@@ -6,7 +6,7 @@ CREATE TABLE sessions (
         REFERENCES users(id)
         ON DELETE CASCADE,
 
-    token_hash TEXT NOT NULL UNIQUE,
+    token_hash BYTEA NOT NULL,
 
     user_agent TEXT,
     ip_address INET,

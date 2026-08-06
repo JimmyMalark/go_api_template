@@ -15,7 +15,6 @@ import (
 
 const createSession = `-- name: CreateSession :one
 INSERT INTO sessions (
-    id,
     user_id,
     token_hash,
     created_at,
@@ -31,16 +30,14 @@ VALUES (
     $4,
     $5,
     $6,
-    $7,
-    $8
+    $7
 )
 RETURNING id, user_id, token_hash, user_agent, ip_address, created_at, expires_at, last_used_at
 `
 
 type CreateSessionParams struct {
-	ID         int64
 	UserID     int64
-	TokenHash  string
+	TokenHash  []byte
 	CreatedAt  time.Time
 	ExpiresAt  time.Time
 	LastUsedAt time.Time
@@ -50,7 +47,6 @@ type CreateSessionParams struct {
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
 	row := q.db.QueryRow(ctx, createSession,
-		arg.ID,
 		arg.UserID,
 		arg.TokenHash,
 		arg.CreatedAt,
@@ -93,6 +89,16 @@ func (q *Queries) DeleteSession(ctx context.Context, id int64) error {
 	return err
 }
 
+const deleteSessionByTokenHash = `-- name: DeleteSessionByTokenHash :exec
+DELETE FROM sessions
+WHERE token_hash = $1
+`
+
+func (q *Queries) DeleteSessionByTokenHash(ctx context.Context, tokenHash []byte) error {
+	_, err := q.db.Exec(ctx, deleteSessionByTokenHash, tokenHash)
+	return err
+}
+
 const deleteSessionsByUserID = `-- name: DeleteSessionsByUserID :exec
 DELETE FROM sessions
 WHERE user_id = $1
@@ -110,7 +116,7 @@ WHERE token_hash = $1
 AND expires_at > NOW()
 `
 
-func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash string) (Session, error) {
+func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash []byte) (Session, error) {
 	row := q.db.QueryRow(ctx, getSessionByTokenHash, tokenHash)
 	var i Session
 	err := row.Scan(

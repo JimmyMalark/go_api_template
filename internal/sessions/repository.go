@@ -15,6 +15,7 @@ type SessionRepository interface {
 	CreateSession(ctx context.Context, params db.CreateSessionParams) (db.Session, error)
 	GetSessionByTokenHash(ctx context.Context, tokenHash string) (db.Session, error)
 	DeleteSession(ctx context.Context, id int64) error
+	DeleteSessionByTokenHash(ctx context.Context, tokenHash string) error
 	DeleteSessionsByUserID(ctx context.Context, userID int64) error
 }
 
@@ -38,7 +39,7 @@ func (r *Repository) CreateSession(
 
 func (r *Repository) GetSessionByTokenHash(
 	ctx context.Context,
-	tokenHash string,
+	tokenHash []byte,
 ) (db.Session, error) {
 	session, err := r.queries.GetSessionByTokenHash(ctx, tokenHash)
 	if err != nil {
@@ -64,6 +65,17 @@ func (r *Repository) DeleteSessionsByUserID(
 	userID int64,
 ) error {
 	if err := r.queries.DeleteSessionsByUserID(ctx, userID); err != nil {
+		return apperrors.FromPostgres(err)
+	}
+
+	return nil
+}
+
+func (r *Repository) DeleteSessionByTokenHash(
+	ctx context.Context,
+	tokenHash []byte,
+) error {
+	if err := r.queries.DeleteSessionByTokenHash(ctx, tokenHash); err != nil {
 		return apperrors.FromPostgres(err)
 	}
 

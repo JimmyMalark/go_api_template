@@ -1,6 +1,5 @@
 -- name: CreateSession :one
 INSERT INTO sessions (
-    id,
     user_id,
     token_hash,
     created_at,
@@ -16,8 +15,7 @@ VALUES (
     $4,
     $5,
     $6,
-    $7,
-    $8
+    $7
 )
 RETURNING *;
 
@@ -43,3 +41,7 @@ WHERE user_id = $1;
 -- name: DeleteExpiredSessions :exec
 DELETE FROM sessions
 WHERE expires_at <= NOW();
+
+-- name: DeleteSessionByTokenHash :exec
+DELETE FROM sessions
+WHERE token_hash = $1;

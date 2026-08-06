@@ -19,10 +19,12 @@ type Handler struct {
 func NewHandler(
 	service *Service,
 	validator *validator.Validator,
+	cookie config.CookieConfig,
 ) *Handler {
 	return &Handler{
 		service:   service,
 		validator: validator,
+		cookie:    cookie,
 	}
 }
 
@@ -92,7 +94,52 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Router /auth/login [post]
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
+	var req LoginRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httpx.WriteError(
+			w,
+			http.StatusBadRequest,
+			"invalid request body",
+			r,
+			err,
+		)
+		return
+	}
+
+	result, err := h.service.Login(
+		r.Context(),
+		req,
+		r.UserAgent(),
+		httpx.ClientIP(r),
+	)
+
+	if err != nil {
+		httpx.WriteError(
+			w,
+			http.StatusUnauthorized,
+			"invalid credentials",
+			r,
+			err,
+		)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session",
+		Value:    result.SessionToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // true in production
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   60 * 60 * 24 * 30,
+	})
+
+	httpx.WriteJSON(
+		w,
+		http.StatusOK,
+		result.User,
+	)
 }
 
 // Logout godoc
@@ -103,7 +150,20 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Router /auth/logout [post]
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
+	token, err := httpx.SessionToken(r, h.cookie)
+	if err != nil {
+		httpx.WriteError(w, http.StatusUnauthorized, "not authenticated", r, err)
+		return
+	}
+
+	if err := h.service.Logout(r.Context(), token); err != nil {
+		httpx.WriteError(w, http.StatusInternalServerError, "failed to logout", r, err)
+		return
+	}
+
+	httpx.ClearSessionCookie(w, h.cookie)
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // Me godoc
@@ -114,5 +174,17 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Router /auth/me [get]
 func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
+	identity, ok := IdentityFromContext(r.Context())
+	if !ok {
+		httpx.WriteError(w, http.StatusUnauthorized, "not authenticated", r, nil)
+		return
+	}
+
+	resp, err := h.service.Me(r.Context(), identity)
+	if err != nil {
+		httpx.WriteError(w, http.StatusInternalServerError, "failed to get user", r, err)
+		return
+	}
+
+	httpx.WriteJSON(w, http.StatusOK, resp)
 }

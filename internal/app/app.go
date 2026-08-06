@@ -81,7 +81,7 @@ func New(ctx context.Context) (*App, error) {
 	r.Route("/v1", func(r chi.Router) {
 		users.RegisterRoutes(r, queries, cacheService)
 
-		auth.RegisterRoutes(r, store)
+		auth.RegisterRoutes(r, store, cfg.Cookie)
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(

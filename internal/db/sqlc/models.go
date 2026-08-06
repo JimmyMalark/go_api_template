@@ -14,7 +14,7 @@ import (
 type Session struct {
 	ID         int64
 	UserID     int64
-	TokenHash  string
+	TokenHash  []byte
 	UserAgent  pgtype.Text
 	IpAddress  *netip.Addr
 	CreatedAt  time.Time

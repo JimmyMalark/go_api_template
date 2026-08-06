@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"encoding/hex"
 	"net/netip"
 	"time"
 
@@ -52,7 +51,7 @@ func toCreateSessionParams(
 
 	return db.CreateSessionParams{
 		UserID:     user.ID,
-		TokenHash:  hex.EncodeToString(tokenHash),
+		TokenHash:  tokenHash,
 		UserAgent:  pgtype.Text{String: userAgent, Valid: true},
 		IpAddress:  &addr,
 		CreatedAt:  now,

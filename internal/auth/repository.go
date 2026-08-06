@@ -17,5 +17,6 @@ type SessionRepository interface {
 	CreateSession(ctx context.Context, params db.CreateSessionParams) (db.Session, error)
 	GetSessionByTokenHash(ctx context.Context, tokenHash string) (db.Session, error)
 	DeleteSession(ctx context.Context, id int64) error
+	DeleteSessionByTokenHash(ctx context.Context, tokenHash string) error
 	DeleteSessionsByUserID(ctx context.Context, userID int64) error
 }

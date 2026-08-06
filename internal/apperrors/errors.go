@@ -13,3 +13,15 @@ var (
 
 	ErrInvalidInput = errors.New("invalid input")
 )
+
+func NewUnauthorizedError(message string) error {
+	return &UnauthorizedError{Message: message}
+}
+
+type UnauthorizedError struct {
+	Message string
+}
+
+func (e *UnauthorizedError) Error() string {
+	return e.Message
+}
